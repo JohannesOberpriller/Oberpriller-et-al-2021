@@ -1,0 +1,38 @@
+   Bayesian calibration of a process-based forest model 
+                          -
+                  a state-space approach
+                          -
+                   supplementary code
+
+
+## Subfolder Models:
+
+This folder contains the modified BASFOR model. 
+The ability to restart the model, to bias the model and to statiscally perturbate the mdoel were addred to the 
+BASFOR implementation of David Cameron (https://github.com/davcam/BASFOR).
+
+BASFERROR: The BASFOR model with bias and statistical error. 
+
+
+## Subfolder Code:
+All the code used to run the calibrations and analyze the results.
+NOTE that the analysis has been carried out using two
+different machines. Hence the different directories.
+
+Prior to the calibration:
+ SensitivityAnalysis.R sensitivity analysis used to determine the 
+   most influential parameters for calibration.
+
+Calibrations:
+ PMCMC_Scenario1.R
+ PMCMC_Scenario2.R
+ PMCMC_Scenario3.R
+
+ standardMCMCcalibration.R
+
+
+Analysis of the results:
+ Results.R
+
+All other files are helper functions used in the calibrations
+(see PMCMC_Scenario....R) or in Results.R.

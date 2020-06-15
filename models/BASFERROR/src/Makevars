@@ -1,0 +1,13 @@
+PKG_FC = $(BINPREF)gfortran $(M_ARCH)
+PKG_FCFLAGS = -O2 -fdefault-real-8 $(DEBUGFLAG) -fbacktrace -mtune=core2  -ggdb
+all: $(SHLIB)
+parameters.o: parameters.f90 
+errors.o: errors.f90
+environment.o: environment.f90 
+management.o: management.f90
+tree.o: tree.f90 management.o
+belowgroundres.o: belowgroundres.f90 
+soil.o: soil.f90 
+set_params.o: set_params.f90 
+set_errors.o: set_errors.f90
+BASFERROR.o: BASFERROR.f90 parameters.o errors.o environment.o tree.o management.o belowgroundres.o soil.o 
