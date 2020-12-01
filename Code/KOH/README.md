@@ -21,4 +21,5 @@ Then we extraplote to the full model calibration data
 + GP_full<sub>ET</sub> = predict(GP<sub>ET</sub>, c(d<sub>ET</sub>, climate))
 + GP_full<sub>GPP</sub> = predict(GP<sub>GPP</sub>, c(d<sub>GPP</sub>, climate))
 
-Then, we calculate the likelihood
+Then, we calculate the likelihood <br>
+*Scripts should be run via the source button in Rstudio and can not be run within jobs, as working directory changes*
