@@ -6,8 +6,8 @@ source("./helper_functions.R")
 # set the forecasting timestep, the runtime and the start of the simulation 
 
 forecastingtimestep = as.integer(100)
-runtime = as.integer(85)
-simulation_start = as.integer(1920)
+runtime = as.integer(10)
+simulation_start = as.integer(1995)
 
 # get the climate data, which are model inputs, in order to run the model 
 

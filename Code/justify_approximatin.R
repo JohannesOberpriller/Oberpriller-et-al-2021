@@ -272,74 +272,8 @@ weather_data <- weather_BASFOR(as.integer(indYears[1]), as.integer(indDays[1]), 
                                clim)
 
 
-# LL_full <- function(pars){
-#   
-#   print(pars)
-#   params[parSel] <- pars[1:6]
-#   
-#   print(params)
-#   
-#   
-#   weather_data <- weather_BASFOR(as.integer(indYears[1]), as.integer(indDays[1]), NDAYS,clim)
-#   
-#   
-#   out <- run_mod_model(rs = as.integer(0), statespace = as.integer(0), 
-#                        bias = as.integer(1), randerr = as.integer(0),
-#                        ft = as.integer(1), p = params, w = weather_data,
-#                        calf = calendar_fert, calN = calendar_Ndep,
-#                        calpT = calendar_prunT, caltT = calendar_thinT, NDAYS,
-#                        NOUT = 24, sv = STATEVARS, stateers = c(1,1,1), procerr = c(1,1,1,1,1))
-#   
-# 
-#   diffGPP <-  fullGPPdata - out[,19]
-#   diffET <- fullETdata - out[,21]
-#   
-#   
-#   GPP_sampled = cbind(out[(length(out[,19])-2000):length(out[,19]),19], weather_data[(length(out[,19])-2000):length(out[,19]),3:7])
-#   GPP_complet = cbind(out[,19], weather_data[1:length(out[,19]),3:7])
-#   
-#   ET_sampled = cbind(out[(length(out[,19])-2000):length(out[,21]),21], weather_data[(length(out[,19])-2000):length(out[,21]),3:7])
-#   ET_complet = cbind(out[,21], weather_data[1:length(out[,21]),3:7])
-#   
-#   fit_GPP = gausspr(x = GPP_sampled , y = diffGPP[(length(out[,19])-2000):length(out[,19])], variance.model =T)
-#   fit_ET = gausspr(x = ET_sampled,  y = diffET[(length(out[,21])-2000):length(out[,21])])
-#   
-#   predict_GPP = predict(fit_GPP, GPP_complet)
-#   predict_ET = predict(fit_ET, ET_complet)
-#   
-#   kernel_GPP = rbfdot(sigma = fit_GPP@kernelf@kpar$sigma)
-#   kernel = kernelMatrix(kernel_GPP, GPP_complet)
-#   
-#   inverse_kernel = chol2inv(chol(kernel))
-# 
-#   lik_GPP = - 1/2*sum(predict_GPP*(inverse_kernel%*%predict_GPP)) # + log(1/sqrt(2*pi*det(inverse_kernel))) 
-#   print(str(inverse_kernel))
-#   print(lik_GPP)
-#   rm(inverse_kernel)
-#   
-#   
-# 
-#   kernel_ET = rbfdot(sigma = fit_ET@kernelf@kpar$sigma)
-#   kernel = kernelMatrix(kernel_ET, ET_complet)
-# 
-#   inverse_kernel = chol2inv(chol(kernel))
-# 
-#   lik_ET =  -1/2*sum(predict_ET*(inverse_kernel%*%predict_ET)) # + log(1/sqrt(2*pi*det(inverse_kernel)))
-# 
-#   rm(inverse_kernel)
-#   diffGPP <-  abs(fullGPPdata - out[,19] - predict_GPP)
-#   diffET <- abs(fullETdata - out[,21] - predict_ET)
-# 
-# 
-#   lik <- sum(dnorm(diffGPP, sd = pars[7], log = T)) +
-#     sum(dnorm(diffET, sd = pars[8], log = T)) + 
-#     lik_GPP + lik_ET
-#   gc()
-#   return(lik)
-#   
-# }
 
-LL_full2 <- function(pars){
+LL_full <- function(pars){
 
   params[parSel] <- pars[1:6]
 
@@ -406,7 +340,7 @@ posterior_sample = posterior_sample[sample(1:240,1), ]
 
 print(posterior_sample)
 
-sample_two = LL_full2(posterior_sample)
+sample_two = LL_full(posterior_sample)
 
 
 saveRDS(sample_two, "./Results/likelihood_full.Rds")
