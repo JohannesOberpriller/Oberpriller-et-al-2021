@@ -22,3 +22,5 @@ Code/data/*
 !Code/data/climate_complete.rds 
 !Code/data/Ndep_complete.rds
 Code/datapreparation.R
+Explanations.txt
+
