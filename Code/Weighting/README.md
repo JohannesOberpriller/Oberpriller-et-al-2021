@@ -13,4 +13,6 @@ where inf is the minimum.
 Then for the individual likelihood contributions of the data streams *L<sub>1</sub>* ... *L<sub>N</sub>*, s.t. L<sub>complete</sub> = *L<sub>1</sub>* + ... + *L<sub>N</sub>*, 
 we change the likelihood to *L<sub>j</sub>* = n<sub>i</sub>/n<sub>j</sub>, s.t. the complete likelihood is L<sub>complete_new</sub> = n<sub>i</sub>/n<sub>1</sub>*L<sub>1</sub>* + ... + n<sub>i/</sub>n<sub>N</sub>*L<sub>N</sub>*.
 
-**More details are in the individual scripts.** 
+**More details are in the individual scripts.** <br>
+*Scripts should be run via the source button in Rstudio and can not be run within jobs, as working directory changes*
+
