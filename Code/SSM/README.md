@@ -5,4 +5,5 @@ In this folder, we explore the possibility to fit a state-space-model to correct
 + PMCMCfun.R: Helper functions for the "true" model
 + PMCMCfun_func.R: Helper functions for the model with structural error 
 + Sampler_validation.R: State-space model for the "true" model
-+ createPrior.R: Helper function to create Priors 
++ createPrior.R: Helper function to create Priors <br>
+*Scripts should be run via the source button in Rstudio and can not be run within jobs, as working directory changes*
