@@ -12,6 +12,7 @@ forecastingtimestep = as.integer(100)
 runtime = as.integer(85)
 simulation_start = as.integer(1920)
 
+# generating reference data 
 source("./GetReferenceData_add_noise.R")
 
 indLL <- seq(1,(NDAYS-(forecastingtimestep -1)), by = forecastingtimestep)   # Marks the starting point of LL calculation
@@ -38,6 +39,7 @@ best <- c(params[parSel], 0.2, 0.2)
 # Priors
 
 
+## set up the density functions for evaluating the priors
 
 density <- function(par){
   
@@ -49,9 +51,10 @@ density <- function(par){
   
 }
 
+## set up the sampler for sampling from the priors 
 
 sampler <- function(n = 1){
-  
+  ## set up flat priors for model parameters
   d1 <- runif(n, lower[1], upper[1])
   d2 <- runif(n, lower[2], upper[2])
   d3 <- runif(n, lower[3], upper[3])
@@ -59,7 +62,7 @@ sampler <- function(n = 1){
   d5 <- runif(n, lower[5], upper[5])
   d6 <- runif(n, lower[6], upper[6])
   
-  
+  ## set up vague gamma priors for standard deviation parameters 
   
   d8 <- rgamma(n, shape = 2, scale = 0.1)
   d9 <- rgamma(n, shape = 2, scale = 0.1)
@@ -70,21 +73,23 @@ sampler <- function(n = 1){
 }
 
 
+## create the prior object 
 
 prior <- createPrior(density = density, sampler = sampler,
                      lower = lower, upper = upper, best = best)
 
+## Set up likelihood for the use in the statsitical inference 
+## to determine parameter values 
+
 LL <- function(pars){
-  
+  ## overwrite default model parameters with sample   
   params[parSel] <- pars[1:6]
   
-  stateers <- rnorm(3, mean = 1, sd = 0.2)
-  procerr <- rnorm(5,mean = 2, sd = 0.2)
-  
+  # set up weather data for the use in BASFOR
   
   weather_data <- weather_BASFOR(as.integer(indYears[1]), as.integer(indDays[1]), NDAYS,clim)
   
-  
+  ## define statevariables 
   STATEVARS = rep(0,14)
   
   out <- run_mod_model(rs = as.integer(0), statespace = as.integer(0), 
@@ -94,12 +99,13 @@ LL <- function(pars){
                        calpT = calendar_prunT, caltT = calendar_thinT, as.integer(NDAYS),
                        NOUT = 24, sv = STATEVARS, stateers = c(1,1,1), procerr = c(1,1,1,1,1))
   
+  ## calculate residuals 
   diffGPP <-  abs(out[,19] - fullGPPdata)
   diffET <- abs(out[,21] - fullETdata)
   
   
   sdGPP <- sdET <- numeric(length(fullGPPdata))
-  
+  ## calculate the likelihood 
   
   lik <- sum(dnorm(diffGPP, sd = pars[7], log = T)) +
     sum(dnorm(diffET, sd = pars[8], log = T))
@@ -108,6 +114,7 @@ LL <- function(pars){
   
 }
 
+## Function for exporting all packages to the cluster 
 
 packageFun <- function(packages = NULL, dlls = NULL) {
   if(!is.null(packages)){
@@ -118,6 +125,7 @@ packageFun <- function(packages = NULL, dlls = NULL) {
   }
 }
 
+## negative loglikelihood used in the optimizer
 
 neg_LL <- function(parms){
   ll <- tryCatch(-LL(parms),error = function(e){return(Inf)})

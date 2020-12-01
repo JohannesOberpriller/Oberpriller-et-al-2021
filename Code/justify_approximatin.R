@@ -155,15 +155,19 @@ LL_approx <- function(pars){
   
 }
 
+## load data from the KOH original method and calculate the likelihood
+## we sample 240 samples from the poserterior
 load("./Results/MCMC_func_KOH_add_noise.RData")
 
 posterior_sample = getSample(out_MCMC, start = 200, numSamples = 240)
 
 posterior_sample = posterior_sample[1:240,]
 
-print(posterior_sample)
+## Caluclate the approximative likelihood of the posterior 
 
 sample_one = apply(FUN = LL_approx, X = posterior_sample, MARGIN = 1)
+
+## Run the setup again and reset parameters 
 
 forecastingtimestep = as.integer(100)
 runtime = as.integer(85)
@@ -274,15 +278,19 @@ weather_data <- weather_BASFOR(as.integer(indYears[1]), as.integer(indDays[1]), 
 
 
 LL_full <- function(pars){
-
+  ## This function contains the actual full likelihood 
+  ## It does not approximate the prior of the GP for the individual parameters 
+  
+  ## fill the parameters with the posterior values 
+  
   params[parSel] <- pars[1:6]
 
 
-
+  ## intialize the weather data 
 
   weather_data <- weather_BASFOR(as.integer(indYears[1]), as.integer(indDays[1]), NDAYS,clim)
 
-
+  ## run the model 
   out <- run_mod_model(rs = as.integer(0), statespace = as.integer(0),
                        bias = as.integer(1), randerr = as.integer(0),
                        ft = as.integer(1), p = params, w = weather_data,
@@ -290,26 +298,31 @@ LL_full <- function(pars){
                        calpT = calendar_prunT, caltT = calendar_thinT, NDAYS,
                        NOUT = 24, sv = STATEVARS, stateers = c(1,1,1), procerr = c(1,1,1,1,1))
 
-
+  ## calculate the residuals 
+  
   diffGPP <-  fullGPPdata - out[,19]
   diffET <- fullETdata - out[,21]
 
-
+  ## subsample the data in order to fit the GP on them 
+  
   GPP_sampled = cbind(out[(length(out[,19])-2000):length(out[,19]),19], weather_data[(length(out[,19])-2000):length(out[,19]),3:7])
   GPP_complet = cbind(out[,19], weather_data[1:length(out[,19]),3:7])
 
   ET_sampled = cbind(out[(length(out[,19])-2000):length(out[,21]),21], weather_data[(length(out[,19])-2000):length(out[,21]),3:7])
   ET_complet = cbind(out[,21], weather_data[1:length(out[,21]),3:7])
 
+  ## fit the GP for the subsampled data  
+  
   fit_GPP = gausspr(x = GPP_sampled , y = diffGPP[(length(out[,19])-2000):length(out[,19])], variance.model =T)
   fit_ET = gausspr(x = ET_sampled,  y = diffET[(length(out[,21])-2000):length(out[,21])])
   
-  
+  ## predict to the rest of the calibration domain
   
   predict_GPP = predict(fit_GPP, GPP_complet)
   predict_ET = predict(fit_ET, ET_complet)
   
-
+  ## Intialize kernel and calculate the prior contribution  
+  
   kernel_GPP = rbfdot(sigma = fit_GPP@kernelf@kpar$sigma)
   kernel = kernelMatrix(kernel_GPP, GPP_sampled)
 
@@ -319,14 +332,17 @@ LL_full <- function(pars){
   kernel_ET = rbfdot(sigma = fit_ET@kernelf@kpar$sigma)
   kernel = kernelMatrix(kernel_ET, ET_sampled)
 
-
+  ## Intialize kernel and calculate the prior contribution
+  
   lik_ET = dmvn(c(fit_ET@fitted), mu =rep(0,length(fit_ET@fitted)), sigma = kernel,log = T)
+  
+  ## Calculate the updated residuals with the model error added
 
-   # rm(inverse_kernel)
   diffGPP <-  abs(fullGPPdata - out[,19] - predict_GPP)
   diffET <- abs(fullETdata - out[,21] - predict_ET)
 
-
+  ## Caluclate the likelihood and return it 
+  
   lik <- sum(dnorm(diffGPP, sd = pars[7], log = T)) +
     sum(dnorm(diffET, sd = pars[8], log = T)) +
     lik_GPP + lik_ET
@@ -335,17 +351,20 @@ LL_full <- function(pars){
 
 }
 
+## sample one of the KOH results 
 
 posterior_sample = posterior_sample[sample(1:240,1), ]
 
-print(posterior_sample)
+## calculate the full likelihood 
 
 sample_two = LL_full(posterior_sample)
 
+## save the results for later use
 
 saveRDS(sample_two, "./Results/likelihood_full.Rds")
 saveRDS(sample_one, "./Results/likelihood_of_approx.Rds")
 
+## Make figure for supporting information
 
 full = readRDS("./Results/likelihood_full.Rds")
 approx = readRDS("./Results/likelihood_of_approx.Rds")

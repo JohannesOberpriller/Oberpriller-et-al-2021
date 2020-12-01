@@ -1,3 +1,6 @@
+## The make calendar Ndep function takes as input a calendar with the climate data, 
+## the simulation start and the runtime and trasnforms this to be used in BASFERROR
+
 make_calendar_Ndep <- function(calendar_Ndep, climate, simulation_start, runtime){
   
   # check if there are less rows than 98, which is somehow the maximum of basfor  
@@ -66,6 +69,10 @@ make_calendar_Ndep <- function(calendar_Ndep, climate, simulation_start, runtime
   }
   return(new_calendar_Ndep)
 }
+
+## The prepare_data function wraps everything up in order to 
+## make the data useable for BASFERROR
+
 
 prepare_data <- function(calendar_Ndep, climate, simulation_start, runtime){
   # check if there are less rows than 100, which is somehow the maximum of basfor  

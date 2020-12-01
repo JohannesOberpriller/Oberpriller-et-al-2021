@@ -4,6 +4,8 @@ library(DHARMa)
 library(BASFERROR)
 library(scales)
 
+## set values for timesteps 
+
 forecastingtimestep = as.integer(100)
 runtime = as.integer(85)
 simulation_start = as.integer(1920)
@@ -113,9 +115,15 @@ indDays <- matrix_weather[indLL, 2]
 
 ### Analysis from correct model ###
 
+## load the data from the correct model 
+
 load("./Results/Model_validation_chain_less_parameter_add_noise.RData")
 
+## sample 240 of the posterior parameter samples  
+
 posterior_samples = getSample(out_MCMC, start = 200, numSamples = 360)
+
+## initialize the matrizes to store results 
 
 GPP_simulations = matrix(nrow = nrow(posterior_samples),
                              ncol = NDAYS)
@@ -127,15 +135,19 @@ residuals_GPP = matrix(nrow = nrow(posterior_samples),
 residuals_ET = matrix(nrow = nrow(posterior_samples),
                         ncol = NDAYS)
 
+## calculate results for all samples 
 for(i in 1:nrow(posterior_samples)){
+  ## fill model parameters with posterior values 
   params[parSel] <- posterior_samples[i,1:6]
+  ## run the model with the parameters 
   out <- run_mod_model(rs = as.integer(0), statespace = as.integer(0),
                        bias = as.integer(0), randerr = as.integer(0),
                        ft = as.integer(1), p = params, w = weather_data,
                        calf = calendar_fert, calN = calendar_Ndep,
                        calpT = calendar_prunT, caltT = calendar_thinT, NDAYS,
                        NOUT = 24, sv = STATEVARS, stateers = c(1,1,1), procerr = c(1,1,1,1,1))
-
+  ## collect the results 
+  
   GPP_simulations[i,] = out[,19]
   ET_simulations[i,] = out[,21]
 
@@ -144,10 +156,13 @@ for(i in 1:nrow(posterior_samples)){
 }
 
 
+## Load data 
 load("./Results/MCMC_func_biased_add_noise.RData")
 
+## sample posterior values 
 posterior_samples = getSample(out_MCMC, start = 200, numSamples = 360)
 
+## set up matrices to store results 
 GPP_simulations_biased = matrix(nrow = nrow(posterior_samples),
                          ncol = NDAYS)
 ET_simulations_biased = matrix(nrow = nrow(posterior_samples),
@@ -158,15 +173,18 @@ residuals_GPP_biased = matrix(nrow = nrow(posterior_samples),
 residuals_ET_biased = matrix(nrow = nrow(posterior_samples),
                       ncol = NDAYS)
 
+## get data for all samples 
 for(i in 1:nrow(posterior_samples)){
+  ## exchange true values with posterior values 
   params[parSel] <- posterior_samples[i,1:6]
+  ## run the model with the posterior parameters 
   out <- run_mod_model(rs = as.integer(0), statespace = as.integer(0),
                        bias = as.integer(1), randerr = as.integer(0),
                        ft = as.integer(1), p = params, w = weather_data,
                        calf = calendar_fert, calN = calendar_Ndep,
                        calpT = calendar_prunT, caltT = calendar_thinT, NDAYS,
                        NOUT = 24, sv = STATEVARS, stateers = c(1,1,1), procerr = c(1,1,1,1,1))
-  
+  ## collect the data from the runs 
   GPP_simulations_biased[i,] = out[,19]
   ET_simulations_biased[i,] = out[,21]
   
@@ -174,24 +192,9 @@ for(i in 1:nrow(posterior_samples)){
   residuals_ET_biased[i,] = out[,21] - fullETdata
 }
 
-residuals_GPP_biased_corrected = matrix(nrow = nrow(posterior_samples),
-                              ncol = NDAYS)
-residuals_ET_biased_corrected = matrix(nrow = nrow(posterior_samples),
-                             ncol = NDAYS)
 
-for(i in 1:nrow(posterior_samples)){
-  params[parSel] <- posterior_samples[i,1:6]
-  out <- run_mod_model(rs = as.integer(0), statespace = as.integer(0),
-                       bias = as.integer(0), randerr = as.integer(0),
-                       ft = as.integer(1), p = params, w = weather_data,
-                       calf = calendar_fert, calN = calendar_Ndep,
-                       calpT = calendar_prunT, caltT = calendar_thinT, NDAYS,
-                       NOUT = 24, sv = STATEVARS, stateers = c(1,1,1), procerr = c(1,1,1,1,1))
-  
+## Make figure for Supporting information
 
-  residuals_GPP_biased_corrected[i,] = out[,19]- fullGPPdata
-  residuals_ET_biased_corrected[i,] = out[,21] - fullETdata
-}
 
 density_GPP_biased = density(as.vector(residuals_GPP_biased), bw = 0.3)
 plot(density_GPP_biased, col = "red", xlim = c(-2,2), xlab = "Residuals", " Density of residuals", ylim = c(0,2))

@@ -69,6 +69,7 @@ output <-  run_mod_model(rs = as.integer(0), statespace = as.integer(0),
 
 
 ## Change some initial values
+
 params[57] <- TREEDENS0 <- output[NDAYS,4]
 params[4] <- CRtree0 <- output[NDAYS,5] / TREEDENS0
 params[2] <- CBtree0 <- output[NDAYS,7] / TREEDENS0
