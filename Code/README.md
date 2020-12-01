@@ -17,6 +17,6 @@ Additionally there are scripts used to prepare and analyse the results:
 - justify_approximation.R: a simulation scirpt, for justification of the approximation for the likelihood. 
 - check_error_distribution.R: sample script to check if statistical or structural error are dominating
 
-More detailed information can be found in the subfolders 
+More detailed information can be found in the subfolders  <br>
 *Scripts should be run via the source button in Rstudio and can not be run within jobs, as working directory changes*
 
