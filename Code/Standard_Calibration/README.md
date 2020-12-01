@@ -16,5 +16,5 @@ This general pattern is applied to four different cases:
 + Model_validation_add_noise.R : The "true" model with balanced data 
 + Problem_func_biased_add_noise.R : The model with structural error with balanced data 
 + Problem_unbal_biased_add_noise.R : The "true" model with unbalanced data 
-+ Problem_unbal_func_biased_add_noise.R : The model with structural error with unbalanced data
++ Problem_unbal_func_biased_add_noise.R : The model with structural error with unbalanced data <br>
 *Scripts should be run via the source button in Rstudio and can not be run within jobs, as working directory changes*
